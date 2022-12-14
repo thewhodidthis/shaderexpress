@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="GLSL live coding HTML custom helper element.">
+    <title>s-express</title>
+    <script src="bundle.js" defer></script>
+    <style>
+      html {
+        font: medium/normal sans-serif;
+        height: 100%;
+      }
+      body {
+        display: grid;
+        margin: 0;
+        min-height: 100%;
+      }
+      figure {
+        margin: auto;
+        position: relative;
+      }
+      figcaption {
+        font-size: small;
+        left: 0;
+        max-width: 30rem;
+        position: absolute;
+        right: 0;
+        text-align: center;
+      }
+      canvas {
+        display: block;
+        object-fit: cover;
+        width: 100%;
+      }
+      img {
+        vertical-align: middle;
+      }
+      s-express:not(:defined) {
+        color: transparent;
+        font: small/1 monospace;
+        white-space: pre;
+        width: 40rem;
+      }
+      s-express {
+        aspect-ratio: 16 / 9;
+        background: whitesmoke;
+        display: grid;
+      }
+      @media all and (max-width: 640px), all and (max-height: 500px) {
+        figcaption {
+          display: none;
+        }
+      }
+    </style>
+    <noscript>
+      <style>
+        s-express {
+          background: url("screenshot.png") center/contain no-repeat;
+        }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <figure>
+      <s-express autoplay height="360" width="640" src="sketch.glsl">
+// http://www.pouet.net/prod.php?which=57245
+// If you intend to reuse this shader, please add credits to 'Danilo Guanabara'
+
+#define t uTime
+#define r uResolution.xy
+
+void sketch(in vec2 vTextureCoord, out vec4 oColor) {
+  vec3 c;
+  float l, z = t;
+
+  for (int i = 0; i < 3; i++) {
+    vec2 uv, p = vTextureCoord.xy;
+
+    uv = p;
+    p -= 0.5;
+    p.x *= r.x / r.y;
+    z += 0.07;
+    l = length(p);
+    uv += p / l * (sin(z) + 1.0) * abs(sin(l * 9.0 - z - z));
+    c[i] = 0.01 / length(mod(uv, 1.0) - 0.5);
+  }
+
+  oColor = vec4(c / l, t);
+}
+      </s-express>
+      <figcaption>
+        <p>Helps with GLSL live coding</p>
+      </figcaption>
+    </figure>
+  </body>
+</html>

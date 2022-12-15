@@ -58,7 +58,7 @@ export class ShaderExpress extends HTMLElement {
         }
         dialog {
           aspect-ratio: 16 / 9;
-          background: rgba(255, 255, 255, 0.975);
+          background: rgba(255, 255, 255, 0.75);
           border: 1px dotted;
           box-sizing: border-box;
           max-width: 50rem;

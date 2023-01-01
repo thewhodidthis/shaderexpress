@@ -69,12 +69,12 @@
 #define t uTime
 #define r uResolution.xy
 
-void sketch(in vec2 vTextureCoord, out vec4 oColor) {
+void sketch(in vec2 vUv, out vec4 oColor) {
   vec3 c;
   float l, z = t;
 
   for (int i = 0; i < 3; i++) {
-    vec2 uv, p = vTextureCoord.xy;
+    vec2 uv, p = vUv.xy;
 
     uv = p;
     p -= 0.5;

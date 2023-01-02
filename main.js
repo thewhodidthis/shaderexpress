@@ -192,10 +192,11 @@ export class ShaderExpress extends HTMLElement {
       const { context: gl, createProgram, createVbo } = glx(canvas)
       const state = {}
       const { width: w, height: h } = canvas
-      const cursor = [0, 0, 0, 0]
+      const pointer = [0, 0, 0, 0]
 
       const tracker = (e) => {
-        cursor.splice(0, cursor.length, e.offsetX, e.offsetY, e.movementX, e.movementY)
+        // NOTE: This won't work on mobile yet.
+        pointer.splice(0, pointer.length, e.offsetX, e.offsetY, e.movementX, e.movementY)
       }
 
       const observer = new MutationObserver(async function onmutate() {
@@ -203,7 +204,7 @@ export class ShaderExpress extends HTMLElement {
 
         gl.useProgram(program)
 
-        state.uCursor = gl.getUniformLocation(program, "uCursor")
+        state.uPointer = gl.getUniformLocation(program, "uPointer")
         state.uResolution = gl.getUniformLocation(program, "uResolution")
         state.uTime = gl.getUniformLocation(program, "uTime")
         state.aPosition = gl.getAttribLocation(program, "aPosition")
@@ -234,8 +235,8 @@ export class ShaderExpress extends HTMLElement {
           gl.uniform2f(state.uResolution, w, h)
         }
 
-        if ("uCursor" in state) {
-          gl.uniform4f(state.uCursor, ...cursor)
+        if ("uPointer" in state) {
+          gl.uniform4f(state.uPointer, ...pointer)
         }
 
         if ("aPosition" in state) {

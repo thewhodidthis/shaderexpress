@@ -189,7 +189,7 @@ export class ShaderExpress extends HTMLElement {
       })
 
       const canvas = this.shadowRoot.querySelector("canvas")
-      const { context: gl, createProgram, createVbo } = glx(canvas)
+      const { gl, createProgram, createVbo } = glx(canvas)
       const state = {}
       const { width: w, height: h } = canvas
       const pointer = [0, 0, 0, 0]
@@ -227,16 +227,16 @@ export class ShaderExpress extends HTMLElement {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, shape)
 
-        if ("uTime" in state) {
-          gl.uniform1f(state.uTime, elapsed * 0.001)
-        }
-
         if ("uResolution" in state) {
           gl.uniform2f(state.uResolution, w, h)
         }
 
         if ("uPointer" in state) {
           gl.uniform4f(state.uPointer, ...pointer)
+        }
+
+        if ("uTime" in state) {
+          gl.uniform1f(state.uTime, elapsed * 0.001)
         }
 
         if ("aPosition" in state) {
@@ -286,7 +286,7 @@ export class ShaderExpress extends HTMLElement {
   }
 }
 
-// Helps with bringing in external GLSL dependencies.
+// Helps bring in external GLSL dependencies.
 export async function loader(...includes) {
   return await import(module)
 }

@@ -3,8 +3,56 @@
   <head>
     <meta charset="utf-8">
     <meta name="description" content="GLSL live coding HTML custom helper element.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>s-express</title>
-    <script src="bundle.js" defer></script>
+    <script type="module">
+      import { ShaderExpress, ShaderExpressModule } from "./main.js"
+      const s = document.querySelector("s-express")
+
+      // Order matters in this case and attaching the error
+      // listener needs to come ahead of element definition.
+      s?.addEventListener("error", function onerror(e) {
+        console.log("error", e?.message)
+
+        video.onloadedmetadata = async () => {
+          edit?.removeAttribute("disabled")
+        }
+      })
+
+      s?.addEventListener("ready", function onready(e) {
+        setTimeout(async () => {
+          await e?.detail?.video?.pause()
+        }, 4000)
+      })
+
+      // Same.
+      self.customElements?.define("s-express-module", ShaderExpressModule)
+      self.customElements?.define("s-express", ShaderExpress)
+
+      const savebutton = document.querySelector("button.save")
+
+      savebutton?.addEventListener("click", function onclick() {
+        const e = new Event("save")
+
+        s?.dispatchEvent(e)
+      })
+
+      const openbutton = document.querySelector("button.open")
+
+      openbutton?.addEventListener("click", function onclick() {
+        const e = new Event("open")
+
+        s?.dispatchEvent(e)
+      })
+
+      const editbutton = document.querySelector("button.edit")
+
+      editbutton.addEventListener("click", function onclick() {
+        const e = new Event("edit")
+
+        s?.dispatchEvent(e)
+      })
+    </script>
     <style>
       html {
         font: medium/normal sans-serif;
@@ -18,36 +66,33 @@
       figure {
         margin: auto;
         position: relative;
+        width: 100%;
       }
       figcaption {
         font-size: small;
         left: 0;
-        max-width: 30rem;
+        margin: auto;
+        max-width: calc(100% - 4rem);
         position: absolute;
         right: 0;
         text-align: center;
-      }
-      canvas {
-        display: block;
-        object-fit: cover;
-        width: 100%;
-      }
-      img {
-        vertical-align: middle;
+        width: 30rem;
       }
       s-express:not(:defined) {
         color: transparent;
         font: small/1 monospace;
         white-space: pre;
-        width: 40rem;
       }
       s-express {
         aspect-ratio: 16 / 9;
+        display: block;
         background: whitesmoke;
-        display: grid;
+        margin: 1.5rem auto 0;
+        max-width: 40rem;
+        width: calc(100% - 3rem);
       }
       @media all and (max-width: 640px), all and (max-height: 500px) {
-        figcaption {
+        figcaption span {
           display: none;
         }
       }
@@ -62,34 +107,15 @@
   </head>
   <body>
     <figure>
-      <s-express autoplay height="360" width="640" src="sketch.glsl">
-// http://www.pouet.net/prod.php?which=57245
-// If you intend to reuse this shader, please add credits to 'Danilo Guanabara'
-
-#define t uTime
-#define r uResolution.xy
-
-void sketch(in vec2 vUv, out vec4 oColor) {
-  vec3 c;
-  float l, z = t;
-
-  for (int i = 0; i < 3; i++) {
-    vec2 uv, p = vUv.xy;
-
-    uv = p;
-    p -= 0.5;
-    p.x *= r.x / r.y;
-    z += 0.07;
-    l = length(p);
-    uv += p / l * (sin(z) + 1.0) * abs(sin(l * 9.0 - z - z));
-    c[i] = 0.01 / length(mod(uv, 1.0) - 0.5);
-  }
-
-  oColor = vec4(c / l, t);
+      <s-express autoplay="autoplay" controls="controls" height="360" width="640">
+        <s-express-module src="noise.glsl"></s-express-module>
+void sketch(in vec2 p, out vec4 oColor) {
+  float n = noise(vec3(p.xy, 1.0) * (2.0 + (uTime * 0.0001)));
+  oColor = vec4(n, n, n, 1.0);
 }
       </s-express>
       <figcaption>
-        <p>Helps with GLSL live coding</p>
+        <p><span>Helps with GLSL live coding</span> <button class="edit">Edit</button> <button class="open">Import</button> <button class="save">Save</button></p>
       </figcaption>
     </figure>
   </body>

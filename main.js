@@ -1,7 +1,15 @@
-import glx from "@thewhodidthis/glx"
-import * as shader from "./shader.js"
+export class ShaderExpressModule extends HTMLElement {
+  constructor() {
+    super()
+  }
+  get src() {
+    return this.getAttribute("src")
+  }
+  set src(v) {
+    this.setAttribute("src", v)
+  }
+}
 
-export class ShaderExpressModule extends HTMLElement {}
 export class ShaderExpress extends HTMLElement {
   constructor() {
     super()
@@ -9,30 +17,23 @@ export class ShaderExpress extends HTMLElement {
     const template = ranger(
       `<style>
         :host {
-          display: grid;
-          place-items: center;
+          display: block;
         }
         :host([hidden]) {
           display: none;
         }
-        :host > menu {
-          grid-area: 1 / 1;
-          margin: 1rem 1rem 0 auto;
-          place-self: start;
+        li {
+          display: inline-block;
         }
         menu {
-          isolation: isolate;
           list-style: none;
           margin: 0;
           padding: 0;
         }
-        li {
-          display: inline-block;
-        }
-        canvas {
+        video {
           height: 100%;
-          grid-area: 1 / 1;
           object-fit: fill;
+          vertical-align: middle;
           width: 100%;
         }
         pre {
@@ -48,7 +49,7 @@ export class ShaderExpress extends HTMLElement {
           width: 100%;
         }
         pre:focus {
-          outline: 1px dashed;
+          outline: 1px dotted;
           outline-offset: 1px;
         }
         form {
@@ -57,37 +58,36 @@ export class ShaderExpress extends HTMLElement {
           height: 100%;
         }
         dialog {
-          aspect-ratio: 16 / 9;
-          background: rgba(255, 255, 255, 0.75);
-          border: 1px dotted;
+          aspect-ratio: 4 / 3;
+          border: 0;
           box-sizing: border-box;
-          max-width: 50rem;
+          max-width: 45rem;
           padding: 1rem;
-          width: 100%;
+          width: calc(100vw - 3rem);
+        }
+        dialog::backdrop {
+          background: whitesmoke;
         }
       </style>
-      <canvas height="${this.height}" width="${this.width}"></canvas>
+      <video height="${this.height}" width="${this.width}" fps="${this.#fps}" muted playsinline></video>
       <dialog>
         <form method="dialog">
-          <pre id="code" contenteditable spellcheck="false">${this.textContent.trim()}</pre>
+          <pre id="code" contenteditable spellcheck="false"></pre>
           <menu>
             <li><input type="submit" value="Update"></li>
             <li><button value="Cancel">Back</button></li>
             <li><input type="reset"></li>
           </menu>
         </form>
-      </dialog>
-      <menu>
-        <li><button class="save">Save</button></li>
-        <li><button class="open">Import</button></li>
-        <li><button class="play">Play</button></li>
-        <li><button class="edit">Edit</button></li>
-      </menu>`
+      </dialog>`
     )
 
     this.attachShadow({ mode: "open" })
     this.shadowRoot.appendChild(template.cloneNode(true))
   }
+  #currentTime = document.timeline.currentTime
+  #fps = 55
+  #lastTick = null
   #frame = null
   get width() {
     return this.getAttribute("width")
@@ -101,11 +101,23 @@ export class ShaderExpress extends HTMLElement {
   set height(v) {
     this.setAttribute("height", v)
   }
+  get fps() {
+    return this.getAttribute("fps")
+  }
+  set fps(v) {
+    this.setAttribute("fps", v)
+  }
   get src() {
     return this.getAttribute("src")
   }
   set src(v) {
     this.setAttribute("src", v)
+  }
+  get controls() {
+    return this.hasAttribute("controls")
+  }
+  set controls(v) {
+    this.setAttribute("controls", v)
   }
   get autoplay() {
     return this.hasAttribute("autoplay")
@@ -120,7 +132,7 @@ export class ShaderExpress extends HTMLElement {
     this.setAttribute("watch", v)
   }
   static get observedAttributes() {
-    return ["width", "height", "src"]
+    return ["height", "width", "src", "fps"]
   }
   async attributeChangedCallback(_, oldValue, newValue) {
     if (oldValue !== null && newValue !== null && newValue !== oldValue) {
@@ -128,7 +140,8 @@ export class ShaderExpress extends HTMLElement {
     }
   }
   async connectedCallback() {
-    if (!this.isConnected) {
+    // Allow nesting, but exclude child elements of the same type making sure tag has context.
+    if (this.localName === this.parentNode?.localName || !this.isConnected) {
       return
     }
 
@@ -141,6 +154,10 @@ export class ShaderExpress extends HTMLElement {
         if (dialog.returnValue === "Update") {
           this.textContent = editor.textContent
         }
+
+        if (document.pictureInPictureElement) {
+          document.exitPictureInPicture()
+        }
       })
 
       const form = this.shadowRoot.querySelector("form")
@@ -149,27 +166,17 @@ export class ShaderExpress extends HTMLElement {
         editor.textContent = this.textContent.trim()
       })
 
-      const edit = this.shadowRoot.querySelector("button.edit")
+      const video = this.shadowRoot.querySelector("video")
+      const { width: w, height: h } = video
+      const state = {}
+      const { gl, programcreator } = glx(w, h)
 
-      edit?.addEventListener("click", function onedit() {
-        dialog?.showModal()
-      })
+      const pointer = [0, 0, 0, 0]
+      const tracker = ({ offsetX: x, offsetY: y }) => {
+        pointer.splice(0, pointer.length, x, y, x - pointer[0], y - pointer[1])
+      }
 
-      const save = this.shadowRoot.querySelector("button.save")
-
-      save?.addEventListener("click", function onsave() {
-        const file = new File([editor.textContent], `sketch-${Date.now()}.glsl`, { type: "text/plain" })
-        const url = URL.createObjectURL(file)
-        const link = document.createElement("a")
-
-        link.setAttribute("download", file.name)
-        link.setAttribute("href", url)
-        link.click()
-      })
-
-      const open = this.shadowRoot.querySelector("button.open")
-
-      open?.addEventListener("click", () => {
+      this.addEventListener("open", function onopen() {
         const input = document.createElement("input")
         const reader = new FileReader()
 
@@ -188,19 +195,37 @@ export class ShaderExpress extends HTMLElement {
         input.click()
       })
 
-      const canvas = this.shadowRoot.querySelector("canvas")
-      const { gl, createProgram, createVbo } = glx(canvas)
-      const state = {}
-      const { width: w, height: h } = canvas
-      const pointer = [0, 0, 0, 0]
+      this.addEventListener("save", function onedit() {
+        const file = new File([editor.textContent], `sketch-${Date.now()}.glsl`, { type: "text/plain" })
+        const url = URL.createObjectURL(file)
+        const link = document.createElement("a")
 
-      const tracker = (e) => {
-        // NOTE: This won't work on mobile yet.
-        pointer.splice(0, pointer.length, e.offsetX, e.offsetY, e.movementX, e.movementY)
-      }
+        link.setAttribute("download", file.name)
+        link.setAttribute("href", url)
+        link.click()
+      })
 
-      const observer = new MutationObserver(async function onmutate() {
-        const program = await createProgram(shader.vertex(), shader.fragment(editor.textContent))
+      this.addEventListener("edit", function onedit() {
+        if (document.pictureInPictureEnabled) {
+          try {
+            video.requestPictureInPicture()
+          } catch (e) {
+            throw e
+          }
+        }
+
+        dialog?.showModal()
+      })
+
+      // Collect dependencies.
+      const extra = await moduleloader(
+        ...Array.from(this.children)
+          .filter(c => c instanceof ShaderExpressModule)
+          .map(c => c.src)
+      )
+
+      const observer = new MutationObserver(function onmutate() {
+        const program = programcreator(vertexshader(), fragmentshader(editor.textContent, ...extra))
 
         gl.useProgram(program)
 
@@ -214,68 +239,72 @@ export class ShaderExpress extends HTMLElement {
         }
       })
 
+      // Input event no good.
       observer.observe(editor, { characterData: true, childList: true, subtree: true })
 
-      const edges = new Float32Array([0, 0, 0, h, w, 0, w, 0, 0, h, w, h])
-      const shape = createVbo(edges)
+      // Trigger program compilation.
+      editor.textContent = this.src ? await filereader(this.src) : this.textContent.trim()
 
-      const loop = (elapsed) => {
+      const edges = Float32Array.of(0, 0, 0, h, w, 0, w, 0, 0, h, w, h)
+      const stride = 2 * Float32Array.BYTES_PER_ELEMENT
+
+      const shape = gl.createBuffer()
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, shape)
+      gl.bufferData(gl.ARRAY_BUFFER, edges, gl.STATIC_DRAW)
+      gl.bindBuffer(gl.ARRAY_BUFFER, null)
+
+      const loop = (timestamp) => {
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
-
         gl.clearColor(1, 1, 1, 1)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
         gl.bindBuffer(gl.ARRAY_BUFFER, shape)
-
-        if ("uResolution" in state) {
-          gl.uniform2f(state.uResolution, w, h)
-        }
 
         if ("uPointer" in state) {
           gl.uniform4f(state.uPointer, ...pointer)
         }
 
         if ("uTime" in state) {
-          gl.uniform1f(state.uTime, elapsed * 0.001)
+          this.#currentTime += timestamp - (this.#lastTick ?? timestamp)
+          this.#lastTick = timestamp
+
+          gl.uniform1f(state.uTime, this.#currentTime)
+        }
+
+        if ("uResolution" in state) {
+          gl.uniform2f(state.uResolution, w, h)
         }
 
         if ("aPosition" in state) {
-          gl.vertexAttribPointer(state.aPosition, 2, gl.FLOAT, gl.TRUE, 2 * Float32Array.BYTES_PER_ELEMENT, 0)
+          gl.vertexAttribPointer(state.aPosition, 2, gl.FLOAT, gl.TRUE, stride, 0)
           gl.drawArrays(gl.TRIANGLES, 0, edges.length / 2)
         }
 
         this.#frame = requestAnimationFrame(loop)
       }
 
-      const play = this.shadowRoot.querySelector("button.play")
+      video.controls = this.controls
+      video.srcObject = gl.canvas.captureStream(this.#fps)
+      video.autoplay = this.autoplay
 
-      play?.addEventListener("click", () => {
-        if (this.#frame) {
-          canvas.removeEventListener("pointermove", tracker)
-          play.replaceChildren("Play")
+      video.onpause = () => {
+        video.removeEventListener("pointermove", tracker)
 
-          this.#frame = cancelAnimationFrame(this.#frame)
-        } else {
-          canvas.addEventListener("pointermove", tracker, { passive: true })
-          play.replaceChildren("Stop")
-
-          this.#frame = requestAnimationFrame(loop)
-        }
-      })
-
-      if (this.src) {
-        const response = await fetch(this.src)
-
-        if (response.ok) {
-          editor.textContent = await response.text()
-        }
+        this.#frame = this.#lastTick = cancelAnimationFrame(this.#frame)
       }
 
-      if (this.autoplay) {
-        play?.click()
+      video.onplay = () => {
+        video.addEventListener("pointermove", tracker, { passive: true })
+
+        this.#frame = requestAnimationFrame(loop)
       }
 
-      const ready = new Event("ready")
+      if (video.autoplay) {
+        await video.play()
+      }
+
+      // All set.
+      const ready = new CustomEvent("ready", { detail: { video } })
 
       this.dispatchEvent(ready)
     } catch ({ message }) {
@@ -286,12 +315,114 @@ export class ShaderExpress extends HTMLElement {
   }
 }
 
+function fragmentshader(s = "void sketch(in vec2 p, out vec4 c) {}", ...extra) {
+  return `#version 300 es
+precision highp float;
+
+in vec2 vUv;
+uniform vec4 uPointer;
+uniform vec2 uResolution;
+uniform float uTime;
+out vec4 oColor;
+
+${extra.join("")}
+${s}
+
+void main() {
+  sketch(vUv, oColor);
+}`
+}
+
+function vertexshader() {
+  return `#version 300 es
+precision highp float;
+
+in vec2 aPosition;
+uniform vec2 uResolution;
+out vec2 vUv;
+
+void main() {
+  vUv = aPosition / uResolution;
+  gl_Position = vec4(((vUv * 2.0) - 1.0) * vec2(1.0, -1.0), 0.0, 1.0);
+}`
+}
+
 // Helps bring in external GLSL dependencies.
-export async function loader(...includes) {
-  return await import(module)
+export function moduleloader(...includes) {
+  return Promise.all(includes.map(async m => await filereader(m)))
 }
 
 // Helps with string to HTML coversion.
 export function ranger(s = "") {
   return document.createRange().createContextualFragment(s)
+}
+
+// Helps read in files as text, useful when loading shaders.
+export function filereader(path = "") {
+  return fetch(path).then(r => r.ok && r.text())
+}
+
+function shadercompiler(gl) {
+  return (type) => {
+    const shader = gl.createShader(type)
+
+    return (source) => {
+      gl.shaderSource(shader, source)
+      gl.compileShader(shader)
+
+      const compileStatus = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
+
+      if (!compileStatus) {
+        throw new Error(`sxs: failed to compile shader: ${gl.getShaderInfoLog(shader)}`)
+      }
+
+      return shader
+    }
+  }
+}
+
+export function programcreator(gl) {
+  const shaderloader = shadercompiler(gl)
+  const program = gl.createProgram()
+
+  const floader = shaderloader(gl.FRAGMENT_SHADER)
+  const vloader = shaderloader(gl.VERTEX_SHADER)
+
+  return (vs, fs) => {
+    const f = floader(fs)
+    const v = vloader(vs)
+
+    gl.attachShader(program, f)
+    gl.attachShader(program, v)
+
+    gl.linkProgram(program)
+
+    const linkStatus = gl.getProgramParameter(program, gl.LINK_STATUS)
+
+    if (!linkStatus) {
+      throw new Error(`sxs: failed to link program: ${gl.gl.getProgramInfoLog(program)}`)
+    }
+
+    gl.deleteShader(f)
+    gl.deleteShader(v)
+
+    gl.validateProgram(program)
+
+    const validateStatus = gl.getProgramParameter(program, gl.VALIDATE_STATUS)
+
+    if (!validateStatus) {
+      throw new Error(`sxs: failed to validate program: ${gl.gl.getProgramInfoLog(program)}`)
+    }
+
+    return program
+  }
+}
+
+function glx(width, height) {
+  const canvas = document.createElement("canvas")
+  const gl = canvas.getContext("webgl2", { antialias: true })
+
+  Object.assign(canvas, { width, height })
+
+  return { gl, shadercompiler: shadercompiler(gl), programcreator: programcreator(gl) }
 }

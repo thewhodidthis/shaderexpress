@@ -1,5 +1,0 @@
-{
-  "imports": {
-    "@thewhodidthis/glx": "https://cdn.jsdelivr.net/gh/thewhodidthis/glx@main/main.js"
-  }
-}

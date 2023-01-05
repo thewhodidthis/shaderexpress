@@ -199,10 +199,10 @@ export class ShaderExpress extends Dummy {
         link.click()
       })
 
-      this.addEventListener("edit", function onedit() {
+      this.addEventListener("edit", async function onedit() {
         if (document.pictureInPictureEnabled) {
           try {
-            video.requestPictureInPicture()
+            await video.requestPictureInPicture()
           } catch (e) {
             throw e
           }
@@ -314,13 +314,13 @@ export class ShaderExpress extends Dummy {
       video.autoplay = this.autoplay
 
       video.onplay = () => {
-        video.addEventListener("pointermove", tracker, { passive: true })
+        document.addEventListener("pointermove", tracker, { passive: true })
 
         this.#frame = this.#frame ?? requestAnimationFrame(loop)
       }
 
       video.onpause = () => {
-        video.removeEventListener("pointermove", tracker)
+        document.removeEventListener("pointermove", tracker)
 
         this.#frame = this.#lastTime = cancelAnimationFrame(this.#frame)
       }

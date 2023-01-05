@@ -6,29 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>s-express</title>
     <script type="module">
-      import { ShaderExpress, ShaderExpressModule } from "./main.js"
+      import { ShaderExpress, ShaderExpressTexture, ShaderExpressModule } from "./main.js"
+
       const s = document.querySelector("s-express")
-
-      // Order matters in this case and attaching the error
-      // listener needs to come ahead of element definition.
-      s?.addEventListener("error", function onerror(e) {
-        console.log("error", e?.message)
-
-        video.onloadedmetadata = async () => {
-          edit?.removeAttribute("disabled")
-        }
-      })
-
-      s?.addEventListener("ready", function onready(e) {
-        setTimeout(async () => {
-          await e?.detail?.video?.pause()
-        }, 120000)
-      })
-
-      // Same.
-      self.customElements?.define("s-express-module", ShaderExpressModule)
-      self.customElements?.define("s-express", ShaderExpress)
-
       const savebutton = document.querySelector("button.save")
 
       savebutton?.addEventListener("click", function onclick() {
@@ -47,11 +27,33 @@
 
       const editbutton = document.querySelector("button.edit")
 
-      editbutton.addEventListener("click", function onclick() {
+      editbutton?.addEventListener("click", function onclick() {
         const e = new Event("edit")
 
         s?.dispatchEvent(e)
       })
+
+      // Order matters and attaching listeners needs to come ahead of element definition.
+      s?.addEventListener("ready", function onready(e) {
+        const video = e?.detail?.video
+
+        setTimeout(async () => {
+          await video?.pause()
+        }, 120000)
+
+        video?.addEventListener("loadedmetadata", function loadedmetadata() {
+          editbutton?.removeAttribute("disabled")
+        })
+      })
+
+      s?.addEventListener("error", function onerror(e) {
+        console.log("oops:", e?.message)
+      })
+
+      // Same, order matters.
+      self.customElements?.define("s-express-module", ShaderExpressModule)
+      self.customElements?.define("s-express-texture", ShaderExpressTexture)
+      self.customElements?.define("s-express", ShaderExpress)
     </script>
     <style>
       html {
@@ -85,8 +87,8 @@
       }
       s-express {
         aspect-ratio: 16 / 9;
-        display: block;
         background: whitesmoke;
+        display: block;
         margin: 1.5rem auto 0;
         max-width: 40rem;
         width: calc(100% - 3rem);
@@ -110,12 +112,12 @@
       <s-express autoplay="autoplay" controls="controls" height="360" width="640">
         <s-express-module src="noise.glsl"></s-express-module>
 void sketch(in vec2 p, out vec4 oColor) {
-  vec3 c = vec3(p * 5.0, uTime * 0.001 * 0.25);
+  vec3 c = vec3(p * uResolution * 0.01, uTime * 0.001 * 0.25);
   oColor = vec4(vec3(noise(c)), 1.0);
 }
       </s-express>
       <figcaption>
-        <p><span>Helps with GLSL live coding</span> <button class="edit">Edit</button> <button class="open">Import</button> <button class="save">Save</button></p>
+        <p><span>Helps with GLSL live coding</span> <button class="edit" disabled>Edit</button> <button class="open">Import</button> <button class="save">Save</button></p>
       </figcaption>
     </figure>
   </body>

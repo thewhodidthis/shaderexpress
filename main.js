@@ -383,14 +383,13 @@ function shadercompiler(gl) {
 
 export function programcreator(gl) {
   const shaderloader = shadercompiler(gl)
-  const program = gl.createProgram()
-
-  const floader = shaderloader(gl.FRAGMENT_SHADER)
-  const vloader = shaderloader(gl.VERTEX_SHADER)
 
   return (vs, fs) => {
+    const floader = shaderloader(gl.FRAGMENT_SHADER)
+    const vloader = shaderloader(gl.VERTEX_SHADER)
     const f = floader(fs)
     const v = vloader(vs)
+    const program = gl.createProgram()
 
     gl.attachShader(program, f)
     gl.attachShader(program, v)

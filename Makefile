@@ -1,2 +1,2 @@
 js:
-	esbuild --bundle --minify --global-name=sxs --outfile=sxpress.js main.js
+	esbuild --bundle --minify --global-name=sxs --outfile=sexpress.js main.js

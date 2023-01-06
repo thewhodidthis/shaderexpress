@@ -59,10 +59,10 @@ export class ShaderExpress extends Dummy {
           height: 100%;
         }
         dialog {
-          aspect-ratio: 3 / 2;
+          aspect-ratio: 5 / 3;
           border: 0;
           box-sizing: border-box;
-          max-width: 45rem;
+          max-width: 50rem;
           padding: 1rem;
           width: calc(100vw - 3rem);
         }
@@ -114,17 +114,17 @@ export class ShaderExpress extends Dummy {
   set controls(v) {
     this.setAttribute("controls", v)
   }
+  get poster() {
+    return this.getAttribute("poster")
+  }
+  set poster(v) {
+    this.setAttribute("poster", v)
+  }
   get autoplay() {
     return this.hasAttribute("autoplay")
   }
   set autoplay(v) {
     this.setAttribute("autoplay", v)
-  }
-  get watch() {
-    return this.hasAttribute("watch")
-  }
-  set watch(v) {
-    this.setAttribute("watch", v)
   }
   static get observedAttributes() {
     return ["height", "width", "src", "fps"]
@@ -311,6 +311,7 @@ export class ShaderExpress extends Dummy {
 
       video.controls = this.controls
       video.srcObject = gl.canvas.captureStream(this.#fps)
+      video.poster = this.poster
       video.autoplay = this.autoplay
 
       video.onplay = () => {

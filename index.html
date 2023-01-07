@@ -44,7 +44,7 @@
         video?.addEventListener("loadedmetadata", function loadedmetadata() {
           editbutton?.removeAttribute("disabled")
         })
-      })
+      }, { once: true })
 
       s?.addEventListener("error", function onerror(e) {
         console.log("oops:", e?.message)
@@ -110,11 +110,15 @@
   </head>
   <body>
     <figure>
-      <s-express autoplay="autoplay" controls="controls" height="360" width="640">
+      <s-express autoplay="autoplay" controls="controls" height="360" width="640" fps="55">
+        <s-express-texture src="texture.png"></s-express-texture>
         <s-express-module src="noise.glsl"></s-express-module>
 void sketch(in vec2 p, out vec4 oColor) {
   vec3 c = vec3(p * uResolution * 0.01, uTime * 0.001 * 0.25);
-  oColor = vec4(vec3(noise(c)), 1.0);
+  float n = noise(c);
+  vec4 s = texture(uTEXTURE, vUv - vec2(n));
+  oColor = vec4(vec3(n), 1.0);
+  // oColor = s;
 }
       </s-express>
       <figcaption>

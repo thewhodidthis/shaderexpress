@@ -1,4 +1,26 @@
-var sxs=(()=>{var A=Object.defineProperty;var B=Object.getOwnPropertyDescriptor;var D=Object.getOwnPropertyNames;var X=Object.prototype.hasOwnProperty;var O=(t,r)=>{for(var i in r)A(t,i,{get:r[i],enumerable:!0})},$=(t,r,i,a)=>{if(r&&typeof r=="object"||typeof r=="function")for(let c of D(r))!X.call(t,c)&&c!==i&&A(t,c,{get:()=>r[c],enumerable:!(a=B(r,c))||a.enumerable});return t};var q=t=>$(A({},"__esModule",{value:!0}),t);var M={};O(M,{ShaderExpress:()=>T,ShaderExpressModule:()=>v,ShaderExpressTexture:()=>p,bulkloader:()=>b,glx:()=>_,programcreator:()=>S,ranger:()=>U,textreader:()=>x,texturecreator:()=>L});var f=class extends HTMLElement{constructor(){super()}get src(){return this.getAttribute("src")}set src(r){this.setAttribute("src",r)}},p=class extends f{},v=class extends f{},T=class extends f{constructor(){super();let r=U(`<style>
+var sexpress = (function(exports) {
+  "use strict"
+
+  class Dummy extends HTMLElement {
+    constructor() {
+      super()
+    }
+    get src() {
+      return this.getAttribute("src")
+    }
+    set src(v) {
+      this.setAttribute("src", v)
+    }
+  }
+
+  class ShaderExpressTexture extends Dummy {}
+  class ShaderExpressModule extends Dummy {}
+  class ShaderExpress extends Dummy {
+    constructor() {
+      super()
+
+      const template = ranger(
+        `<style>
         :host {
           display: block;
         }
@@ -61,7 +83,299 @@ var sxs=(()=>{var A=Object.defineProperty;var B=Object.getOwnPropertyDescriptor;
             <li><input type="reset"></li>
           </menu>
         </form>
-      </dialog>`);this.attachShadow({mode:"open"}),this.shadowRoot.appendChild(r.cloneNode(!0));let i=this.shadowRoot.querySelector("textarea");this.shadowRoot.querySelector("form").addEventListener("reset",()=>{let e=new InputEvent("input",{data:this.textContent.trim()});i.dispatchEvent(e)});let c=this.shadowRoot.querySelector("video"),o=this.shadowRoot.querySelector("dialog");o.addEventListener("close",()=>{o.returnValue==="Update"&&(this.textContent=i.value),document.pictureInPictureElement&&document.exitPictureInPicture()}),this.addEventListener("edit",async function(){if(document.pictureInPictureEnabled)try{await c.requestPictureInPicture()}catch(n){throw n}o.showModal()}),this.addEventListener("open",function(){let n=document.createElement("input"),d=new FileReader;d.addEventListener("load",function(l){let E=new InputEvent("input",{data:l.target.result});i.dispatchEvent(E)}),n.setAttribute("accept",".glsl"),n.setAttribute("type","file"),n.addEventListener("change",function(){let[l]=n?.files;d.readAsText(l)}),n.click()}),this.addEventListener("save",function(){let n=new File([i.value],`sketch-${Date.now()}.glsl`,{type:"text/plain"}),d=URL.createObjectURL(n),u=document.createElement("a");u.setAttribute("download",n.name),u.setAttribute("href",d),u.click()})}#r=document.timeline.currentTime;#e=null;#i=55;#t=null;static get observedAttributes(){return["height","width","src","fps"]}get height(){return this.getAttribute("height")}set height(r){this.setAttribute("height",r)}get width(){return this.getAttribute("width")}set width(r){this.setAttribute("width",r)}get fps(){return this.getAttribute("fps")}set fps(r){this.setAttribute("fps",r)}get controls(){return this.hasAttribute("controls")}set controls(r){this.setAttribute("controls",r)}get autoplay(){return this.hasAttribute("autoplay")}set autoplay(r){this.setAttribute("autoplay",r)}get poster(){return this.getAttribute("poster")}set poster(r){this.setAttribute("poster",r)}async attributeChangedCallback(r,i,a){i!==null&&a!==null&&a!==i&&await this.connectedCallback()}async connectedCallback(){if(!!this.isConnected)try{let r=this.shadowRoot.querySelector("textarea"),i=this.shadowRoot.querySelector("video"),{width:a,height:c}=this,o={},{gl:e,createProgram:n,createTexture:d}=_(a,c);Object.assign(i,{width:a,height:c});let u=[0,0,0,0],l=({offsetX:s,offsetY:h})=>{u.splice(0,u.length,s,h,s-u[0],h-u[1])},g=await b(d)(...new Set(Array.from(this.children).filter(s=>s instanceof p).map(s=>s.src))),F=await b(x)(...new Set(Array.from(this.children).filter(s=>s instanceof v).map(s=>s.src)));r.oninput=s=>{s.inputType===""&&s.data!==null&&(r.value=r.textContent=s.data);let h=n(W(),N(r.value,...g.map(m=>`uniform sampler2D u${m.id};`),...F));e.useProgram(h),g.forEach(m=>{let y=`u${m.id}`;o[y]=e.getUniformLocation(h,y)}),o.uPointer=e.getUniformLocation(h,"uPointer"),o.uResolution=e.getUniformLocation(h,"uResolution"),o.uWindow=e.getUniformLocation(h,"uWindow"),o.uTime=e.getUniformLocation(h,"uTime"),o.aPosition=e.getAttribLocation(h,"aPosition"),o.aPosition!==-1&&e.enableVertexAttribArray(o.aPosition)};let R=Float32Array.of(0,0,0,c,a,0,a,0,0,c,a,c),k=2*Float32Array.BYTES_PER_ELEMENT,P=e.createBuffer();e.bindBuffer(e.ARRAY_BUFFER,P),e.bufferData(e.ARRAY_BUFFER,R,e.STATIC_DRAW),e.bindBuffer(e.ARRAY_BUFFER,null),g.forEach((s,h)=>{let m=`u${s.id}`;s.id in o&&(e.activeTexture(e.TEXTURE0+h),e.bindTexture(e.TEXTURE_2D,s.texture),e.uniform1i(o[m],h))});let w=s=>{e.viewport(0,0,e.drawingBufferWidth,e.drawingBufferHeight),e.clearColor(1,1,1,1),e.clear(e.COLOR_BUFFER_BIT|e.DEPTH_BUFFER_BIT),e.bindBuffer(e.ARRAY_BUFFER,P),"uPointer"in o&&e.uniform4f(o.uPointer,...u),"uTime"in o&&(this.#r+=s-(this.#e??s),this.#e=s,e.uniform1f(o.uTime,this.#r)),"uResolution"in o&&e.uniform2f(o.uResolution,a,c),"uWindow"in o&&e.uniform2f(o.uWindow,self.innerWidth,self.innerHeight),"aPosition"in o&&(e.vertexAttribPointer(o.aPosition,2,e.FLOAT,e.TRUE,k,0),e.drawArrays(e.TRIANGLES,0,R.length/2)),this.#t=requestAnimationFrame(w)};i.controls=this.controls,i.srcObject=e.canvas.captureStream(Number(this.fps)),i.autoplay=this.autoplay,this.poster&&(i.poster=this.poster),i.onpause=()=>{document.removeEventListener("pointermove",l),this.#t=this.#e=cancelAnimationFrame(this.#t)},i.onplay=()=>{document.addEventListener("pointermove",l,{passive:!0}),this.#t=this.#t??requestAnimationFrame(w)},this.autoplay&&(this.#t=this.#e=cancelAnimationFrame(this.#t),this.#t=requestAnimationFrame(w));let C=new InputEvent("input",{data:this.src?await x(this.src):this.textContent.trim()});r.dispatchEvent(C);let I=new CustomEvent("ready",{detail:{video:i}});this.dispatchEvent(I)}catch({message:r}){let i=new ErrorEvent("error",{message:r});this.dispatchEvent(i)}}};function N(t="void sketch(in vec2 p, out vec4 c) {}",...r){return`#version 300 es
+      </dialog>`,
+      )
+
+      this.attachShadow({ mode: "open" })
+      this.shadowRoot.appendChild(template.cloneNode(true))
+
+      const textarea = this.shadowRoot.querySelector("textarea")
+      const form = this.shadowRoot.querySelector("form")
+
+      form.addEventListener("reset", () => {
+        const inputevent = new InputEvent("input", { data: this.textContent.trim() })
+
+        textarea.dispatchEvent(inputevent)
+      })
+
+      const video = this.shadowRoot.querySelector("video")
+      const dialog = this.shadowRoot.querySelector("dialog")
+
+      dialog.addEventListener("close", () => {
+        // NOTE: Fires on cancel too.
+        if (dialog.returnValue === "Update") {
+          this.textContent = textarea.value
+        }
+
+        if (document.pictureInPictureElement) {
+          document.exitPictureInPicture()
+        }
+      })
+
+      this.addEventListener("edit", async function onedit() {
+        if (document.pictureInPictureEnabled) {
+          try {
+            await video.requestPictureInPicture()
+          } catch (e) {
+            throw e
+          }
+        }
+
+        dialog.showModal()
+      })
+
+      this.addEventListener("open", function onopen() {
+        const input = document.createElement("input")
+        const reader = new FileReader()
+
+        reader.addEventListener("load", function onload(e) {
+          const inputevent = new InputEvent("input", { data: e.target.result })
+
+          textarea.dispatchEvent(inputevent)
+        })
+
+        input.setAttribute("accept", ".glsl")
+        input.setAttribute("type", "file")
+        input.addEventListener("change", function onchange() {
+          const [f] = input?.files
+
+          reader.readAsText(f)
+        })
+
+        input.click()
+      })
+
+      this.addEventListener("save", function onedit() {
+        const file = new File([textarea.value], `sketch-${Date.now()}.glsl`, { type: "text/plain" })
+        const url = URL.createObjectURL(file)
+        const link = document.createElement("a")
+
+        link.setAttribute("download", file.name)
+        link.setAttribute("href", url)
+        link.click()
+      })
+    }
+    #currentTime = document.timeline.currentTime
+    #lastTime = null
+    #fps = 55
+    #frame = null
+    static get observedAttributes() {
+      return ["height", "width", "src", "fps"]
+    }
+    get height() {
+      return this.getAttribute("height")
+    }
+    set height(v) {
+      this.setAttribute("height", v)
+    }
+    get width() {
+      return this.getAttribute("width")
+    }
+    set width(v) {
+      this.setAttribute("width", v)
+    }
+    get fps() {
+      return this.getAttribute("fps")
+    }
+    set fps(v) {
+      this.setAttribute("fps", v)
+    }
+    get controls() {
+      return this.hasAttribute("controls")
+    }
+    set controls(v) {
+      this.setAttribute("controls", v)
+    }
+    get autoplay() {
+      return this.hasAttribute("autoplay")
+    }
+    set autoplay(v) {
+      this.setAttribute("autoplay", v)
+    }
+    get poster() {
+      return this.getAttribute("poster")
+    }
+    set poster(v) {
+      this.setAttribute("poster", v)
+    }
+    async attributeChangedCallback(_, oldValue, newValue) {
+      if (oldValue !== null && newValue !== null && newValue !== oldValue) {
+        await this.connectedCallback()
+      }
+    }
+    async connectedCallback() {
+      // NOTE: Not sure if this makes a difference here.
+      if (!this.isConnected) {
+        return
+      }
+
+      try {
+        const textarea = this.shadowRoot.querySelector("textarea")
+        const video = this.shadowRoot.querySelector("video")
+
+        const { width, height } = this
+        const state = {}
+        const { gl, createProgram, createTexture } = glx(width, height)
+
+        Object.assign(video, { width, height })
+
+        const pointer = [0, 0, 0, 0]
+        const tracker = ({ offsetX: x, offsetY: y }) => {
+          pointer.splice(0, pointer.length, x, y, x - pointer[0], y - pointer[1])
+        }
+
+        // Collect images into textures.
+        const textureloader = bulkloader(createTexture)
+        const textures = await textureloader(
+          ...new Set(
+            Array.from(this.children)
+              .filter(c => c instanceof ShaderExpressTexture)
+              .map(c => c.src),
+          ),
+        )
+
+        // Collect dependencies.
+        const moduleloader = bulkloader(textreader)
+        const modules = await moduleloader(
+          ...new Set(
+            Array.from(this.children)
+              .filter(c => c instanceof ShaderExpressModule)
+              .map(c => c.src),
+          ),
+        )
+
+        // Update content before attaching the input watcher.
+        textarea.oninput = (e) => {
+          if (e.inputType === "" && e.data !== null) {
+            textarea.value = textarea.textContent = e.data
+          }
+
+          const program = createProgram(
+            vertexshader(),
+            fragmentshader(
+              textarea.value,
+              ...textures.map((t) => `uniform sampler2D u${t.id};`),
+              ...modules,
+            ),
+          )
+
+          gl.useProgram(program)
+
+          // Map textures into uniform locations.
+          textures.forEach((t) => {
+            const id = `u${t.id}`
+
+            state[id] = gl.getUniformLocation(program, id)
+          })
+
+          state.uPointer = gl.getUniformLocation(program, "uPointer")
+          state.uResolution = gl.getUniformLocation(program, "uResolution")
+          state.uWindow = gl.getUniformLocation(program, "uWindow")
+          state.uTime = gl.getUniformLocation(program, "uTime")
+          state.aPosition = gl.getAttribLocation(program, "aPosition")
+
+          if (state.aPosition !== -1) {
+            gl.enableVertexAttribArray(state.aPosition)
+          }
+        }
+
+        const edges = Float32Array.of(0, 0, 0, height, width, 0, width, 0, 0, height, width, height)
+        const stride = 2 * Float32Array.BYTES_PER_ELEMENT
+        const shape = gl.createBuffer()
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, shape)
+        gl.bufferData(gl.ARRAY_BUFFER, edges, gl.STATIC_DRAW)
+        gl.bindBuffer(gl.ARRAY_BUFFER, null)
+
+        textures.forEach((t, i) => {
+          const id = `u${t.id}`
+
+          if (t.id in state) {
+            gl.activeTexture(gl.TEXTURE0 + i)
+            gl.bindTexture(gl.TEXTURE_2D, t.texture)
+            gl.uniform1i(state[id], i)
+          }
+        })
+
+        const loop = (timestamp) => {
+          gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
+          gl.clearColor(1, 1, 1, 1)
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+          gl.bindBuffer(gl.ARRAY_BUFFER, shape)
+
+          if ("uPointer" in state) {
+            gl.uniform4f(state.uPointer, ...pointer)
+          }
+
+          if ("uTime" in state) {
+            this.#currentTime += timestamp - (this.#lastTime ?? timestamp)
+            this.#lastTime = timestamp
+
+            gl.uniform1f(state.uTime, this.#currentTime)
+          }
+
+          if ("uResolution" in state) {
+            gl.uniform2f(state.uResolution, width, height)
+          }
+
+          if ("uWindow" in state) {
+            gl.uniform2f(state.uWindow, self.innerWidth, self.innerHeight)
+          }
+
+          if ("aPosition" in state) {
+            gl.vertexAttribPointer(state.aPosition, 2, gl.FLOAT, gl.TRUE, stride, 0)
+            gl.drawArrays(gl.TRIANGLES, 0, edges.length / 2)
+          }
+
+          this.#frame = requestAnimationFrame(loop)
+        }
+
+        video.controls = this.controls
+        video.srcObject = gl.canvas.captureStream(Number(this.fps))
+        video.autoplay = this.autoplay
+
+        if (this.poster) {
+          video.poster = this.poster
+        }
+
+        video.onpause = () => {
+          document.removeEventListener("pointermove", tracker)
+
+          this.#frame = this.#lastTime = cancelAnimationFrame(this.#frame)
+        }
+
+        // These being on style handlers means they replace any previous ones.
+        video.onplay = () => {
+          document.addEventListener("pointermove", tracker, { passive: true })
+
+          this.#frame = this.#frame ?? requestAnimationFrame(loop)
+        }
+
+        if (this.autoplay) {
+          this.#frame = this.#lastTime = cancelAnimationFrame(this.#frame)
+          this.#frame = requestAnimationFrame(loop)
+        }
+
+        // All set.
+        const inputevent = new InputEvent("input", {
+          data: this.src ? await textreader(this.src) : this.textContent.trim(),
+        })
+
+        textarea.dispatchEvent(inputevent)
+
+        const readyevent = new CustomEvent("ready", { detail: { video } })
+
+        this.dispatchEvent(readyevent)
+      } catch ({ message }) {
+        const errorevent = new ErrorEvent("error", { message })
+
+        this.dispatchEvent(errorevent)
+      }
+    }
+  }
+
+  function fragmentshader(s = "void sketch(in vec2 p, out vec4 c) {}", ...extras) {
+    return `#version 300 es
 precision highp float;
 
 in vec2 vUv;
@@ -71,13 +385,16 @@ uniform vec2 uWindow;
 uniform float uTime;
 out vec4 oColor;
 
-${r.join(`
-`)}
-${t}
+${extras.join("\n")}
+${s}
 
 void main() {
   sketch(vUv, oColor);
-}`}function W(){return`#version 300 es
+}`
+  }
+
+  function vertexshader() {
+    return `#version 300 es
 precision highp float;
 
 in vec2 aPosition;
@@ -87,4 +404,135 @@ out vec2 vUv;
 void main() {
   vUv = aPosition / uResolution;
   gl_Position = vec4(((vUv * 2.0) - 1.0) * vec2(1.0, -1.0), 0.0, 1.0);
-}`}function U(t=""){return document.createRange().createContextualFragment(t)}function b(t){return function(...i){return Promise.all(i.map(async a=>await t(a)))}}function x(t){return fetch(t).then(r=>r.ok&&r.text())}function _(t,r){let i=document.createElement("canvas"),a=i.getContext("webgl2",{antialias:!0});return Object.assign(i,{width:t,height:r}),{gl:a,createProgram:S(a),createTexture:L(a)}}function L(t){return function(i,a){let c=t.createTexture();return t.bindTexture(t.TEXTURE_2D,c),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_WRAP_S,t.CLAMP_TO_EDGE),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_WRAP_T,t.CLAMP_TO_EDGE),t.texParameteri(t.TEXTURE_2D,t.TEXTURE_MIN_FILTER,t.LINEAR),new Promise((o,e)=>{let n=new Image;n.onerror=d=>{e(d)},n.onload=()=>{let{width:d,height:u}=n;t.texImage2D(t.TEXTURE_2D,0,t.RGBA,d,u,0,t.RGBA,t.UNSIGNED_BYTE,n),o({texture:c,id:i.split(".").shift().toUpperCase()})},n.src=i,a!==void 0&&(n.crossOrigin=a)})}}function G(t){return r=>{let i=t.createShader(r);return function(c){if(t.shaderSource(i,c),t.compileShader(i),!t.getShaderParameter(i,t.COMPILE_STATUS))throw new Error(`sxs: failed to compile shader: ${t.getShaderInfoLog(i)}`);return i}}}function S(t){let r=G(t),i=r(t.FRAGMENT_SHADER),a=r(t.VERTEX_SHADER);return function(o,e){let n=t.createProgram(),d=i(e),u=a(o);if(t.attachShader(n,d),t.attachShader(n,u),t.linkProgram(n),!t.getProgramParameter(n,t.LINK_STATUS))throw new Error(`sxs: failed to link program: ${t.gl.getProgramInfoLog(n)}`);if(t.deleteShader(d),t.deleteShader(u),t.validateProgram(n),!t.getProgramParameter(n,t.VALIDATE_STATUS))throw new Error(`sxs: failed to validate program: ${t.gl.getProgramInfoLog(n)}`);return n}}return q(M);})();
+}`
+  }
+
+  // Helps with string to HTML coversion.
+  function ranger(s = "") {
+    return document.createRange().createContextualFragment(s)
+  }
+
+  // Helps load promisified things in bulk.
+  function bulkloader(loader) {
+    return function load(...list) {
+      return Promise.all(list.map(async item => await loader(item)))
+    }
+  }
+
+  // Helps read in files as text.
+  function textreader(path) {
+    return fetch(path).then(r => r.ok && r.text())
+  }
+
+  // Provides helpers for program and texture creation tied
+  // to an in-memory WebGL2 context.
+  function glx(width, height) {
+    const canvas = document.createElement("canvas")
+    const gl = canvas.getContext("webgl2", { antialias: true })
+
+    Object.assign(canvas, { width, height })
+
+    return { gl, createProgram: programcreator(gl), createTexture: texturecreator(gl) }
+  }
+
+  // Helps load images into textures.
+  function texturecreator(gl) {
+    return function createTexture(src, crossorigin) {
+      const texture = gl.createTexture()
+
+      gl.bindTexture(gl.TEXTURE_2D, texture)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+
+      return new Promise((resolve, reject) => {
+        const image = new Image()
+
+        image.onerror = (e) => {
+          reject(e)
+        }
+
+        image.onload = () => {
+          const { width: w, height: h } = image
+
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, image)
+
+          resolve({ texture, id: src.split(".").shift().toUpperCase() })
+        }
+
+        image.src = src
+
+        if (crossorigin !== undefined) {
+          image.crossOrigin = crossorigin
+        }
+      })
+    }
+  }
+
+  function shadercompiler(gl) {
+    return (type) => {
+      return function compileShader(source) {
+        const shader = gl.createShader(type)
+
+        gl.shaderSource(shader, source)
+        gl.compileShader(shader)
+
+        const compilestatus = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
+
+        if (!compilestatus) {
+          throw new Error(`sxs: failed to compile shader: ${gl.getShaderInfoLog(shader)}`)
+        }
+
+        return shader
+      }
+    }
+  }
+
+  function programcreator(gl) {
+    const shadercreator = shadercompiler(gl)
+    const floader = shadercreator(gl.FRAGMENT_SHADER)
+    const vloader = shadercreator(gl.VERTEX_SHADER)
+
+    return function createProgram(vshader, fshader) {
+      const program = gl.createProgram()
+      const f = floader(fshader)
+      const v = vloader(vshader)
+
+      gl.attachShader(program, f)
+      gl.attachShader(program, v)
+
+      gl.linkProgram(program)
+
+      const linkstatus = gl.getProgramParameter(program, gl.LINK_STATUS)
+
+      if (!linkstatus) {
+        throw new Error(`sxs: failed to link program: ${gl.gl.getProgramInfoLog(program)}`)
+      }
+
+      gl.deleteShader(f)
+      gl.deleteShader(v)
+
+      gl.validateProgram(program)
+
+      const validatestatus = gl.getProgramParameter(program, gl.VALIDATE_STATUS)
+
+      if (!validatestatus) {
+        throw new Error(`sxs: failed to validate program: ${gl.gl.getProgramInfoLog(program)}`)
+      }
+
+      return program
+    }
+  }
+
+  exports.ShaderExpress = ShaderExpress
+  exports.ShaderExpressModule = ShaderExpressModule
+  exports.ShaderExpressTexture = ShaderExpressTexture
+  exports.bulkloader = bulkloader
+  exports.glx = glx
+  exports.programcreator = programcreator
+  exports.ranger = ranger
+  exports.textreader = textreader
+  exports.texturecreator = texturecreator
+
+  return exports
+})({})

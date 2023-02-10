@@ -1,2 +1,5 @@
-js:
-	esbuild --bundle --minify --global-name=sxs --outfile=sexpress.js main.js
+bundle: rollup dprint
+rollup:
+	rollup main.js --format iife --file sexpress.js --name sexpress
+dprint:
+	dprint fmt sexpress.js

@@ -464,9 +464,9 @@ export function texturecreator(gl) {
 
 function shadercompiler(gl) {
   return (type) => {
-    const shader = gl.createShader(type)
-
     return function compileShader(source) {
+      const shader = gl.createShader(type)
+
       gl.shaderSource(shader, source)
       gl.compileShader(shader)
 
@@ -482,14 +482,14 @@ function shadercompiler(gl) {
 }
 
 export function programcreator(gl) {
-  const shaderloader = shadercompiler(gl)
-  const floader = shaderloader(gl.FRAGMENT_SHADER)
-  const vloader = shaderloader(gl.VERTEX_SHADER)
+  const shadercreator = shadercompiler(gl)
+  const floader = shadercreator(gl.FRAGMENT_SHADER)
+  const vloader = shadercreator(gl.VERTEX_SHADER)
 
-  return function createProgram(vs, fs) {
+  return function createProgram(vshader, fshader) {
     const program = gl.createProgram()
-    const f = floader(fs)
-    const v = vloader(vs)
+    const f = floader(fshader)
+    const v = vloader(vshader)
 
     gl.attachShader(program, f)
     gl.attachShader(program, v)

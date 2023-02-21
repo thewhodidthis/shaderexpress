@@ -1,6 +1,6 @@
 ## about
 
-Shader Toy inspired GLSL live sketching HTML custom helper element.
+Shader Toy inspired GLSL live sketching HTML custom element.
 
 ## setup
 

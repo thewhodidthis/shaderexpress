@@ -10,6 +10,6 @@ Include the `sexpress.js` script in your page, e.g.:
 <script src="sexpress.js"></script>
 ```
 
-## details
+## usage
 
 Need disable controls for iOS pointermove events to work in full screen mode.

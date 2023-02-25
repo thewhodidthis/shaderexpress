@@ -66,11 +66,6 @@
         margin: 0;
         min-height: 100%;
       }
-      figure {
-        margin: auto;
-        position: relative;
-        width: 100%;
-      }
       figcaption {
         font-size: small;
         left: 0;
@@ -81,6 +76,11 @@
         text-align: center;
         width: 30rem;
       }
+      figure {
+        margin: auto;
+        position: relative;
+        width: 100%;
+      }
       s-express:not(:defined) {
         color: transparent;
         font: small/1 monospace;
@@ -90,11 +90,11 @@
         aspect-ratio: 16 / 9;
         background: whitesmoke;
         display: block;
-        margin: 1.5rem auto 0;
+        margin: 0 auto;
         max-width: 40rem;
         width: calc(100% - 3rem);
       }
-      @media all and (max-width: 640px), all and (max-height: 500px) {
+      @media all and (max-width: 640px) and (max-height: 360px) {
         figcaption span {
           display: none;
         }

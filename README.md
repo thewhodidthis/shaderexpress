@@ -1,6 +1,6 @@
 ## about
 
-Bring your own buttons, [Shadertoy](https://www.shadertoy.com) inspired GLSL live sketching HTML custom element.
+Bring your own buttons [Shadertoy](https://www.shadertoy.com) inspired GLSL live sketching HTML custom element.
 
 ## setup
 

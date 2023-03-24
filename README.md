@@ -42,8 +42,8 @@ void sketch(in vec2 p, out vec4 oColor) {
 </s-express>
 <!-- Include the HTML custom element definitions and helper functions. -->
 <script src="https://thewhodidthis.github.io/shaderexpress/sexpress.js"></script>
-<!-- Turn it on. -->
 <script>
+  // Turn it on.
   self.customElements?.define("s-express", sexpress.ShaderExpress)
 </script>
 ```

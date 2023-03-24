@@ -44,11 +44,7 @@ void sketch(in vec2 p, out vec4 oColor) {
 <script src="https://thewhodidthis.github.io/shaderexpress/sexpress.js"></script>
 <!-- Turn it on. -->
 <script>
-  const { ShaderExpress, ShaderExpressTexture, ShaderExpressModule } = sexpress
-
-  self.customElements?.define("s-express-module", ShaderExpressModule)
-  self.customElements?.define("s-express-texture", ShaderExpressTexture)
-  self.customElements?.define("s-express", ShaderExpress)
+  self.customElements?.define("s-express", sexpress.ShaderExpress)
 </script>
 ```
 

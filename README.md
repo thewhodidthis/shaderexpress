@@ -1,6 +1,6 @@
 ## about
 
-[Shadertoy](https://www.shadertoy.com) inspired, bring your own buttons, GLSL live sketching HTML custom element. I made this so I can practice with color and texture based drawing in particular.
+A [Shadertoy](https://www.shadertoy.com) inspired, bring your own buttons, GLSL live sketching HTML custom element to help practice color and texture based drawing. Allows for saving and importing own sketches. Enables referencing external code without having to rely on build tools such as [glslify](https://github.com/glslify/glslify).
 
 ## setup
 

@@ -19,6 +19,7 @@ export class ShaderExpress extends Dummy {
     const template = ranger(
       `<style>
         :host {
+          contain: content;
           display: block;
         }
         :host([hidden]) {
@@ -31,12 +32,6 @@ export class ShaderExpress extends Dummy {
           list-style: none;
           margin: 0;
           padding: 0;
-        }
-        video {
-          height: 100%;
-          object-fit: fill;
-          vertical-align: middle;
-          width: 100%;
         }
         textarea {
           border: 0;
@@ -70,11 +65,11 @@ export class ShaderExpress extends Dummy {
           background: whitesmoke;
         }
       </style>
-      <video height="${this.height}" width="${this.width}" muted playsinline></video>
-      <dialog>
-        <form method="dialog">
-          <textarea spellcheck="false"></textarea>
-          <menu>
+      <video height="${this.height}" width="${this.width}" part="video" muted playsinline></video>
+      <dialog part="dialog">
+        <form method="dialog" part="form">
+          <textarea spellcheck="false" part="textarea"></textarea>
+          <menu part="menu">
             <li><input type="submit" value="Update"></li>
             <li><button value="Cancel">Back</button></li>
             <li><input type="reset"></li>

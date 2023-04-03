@@ -1,6 +1,10 @@
 ## about
 
-A [Shadertoy](https://www.shadertoy.com) inspired, bring your own buttons, GLSL live sketching HTML custom element to help practice color and texture based drawing. Allows for saving and importing own sketches. Enables referencing external code without having to rely on build tools like [glslify](https://github.com/glslify/glslify).
+A [Shadertoy](https://www.shadertoy.com) inspired, bring your own buttons, GLSL live coding HTML custom element to help practice color and texture based drawing. Instead of presenting code and results side by side as is often the case, [`HTMLCanvasElement.captureStream`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream) output is fed to a `<video>` element. That means picture-in-picture, fullscreen mode, and FPS throttling are readily available out of the box. Also, the `<textarea>` editor is wrapped in a `<dialog>`, which brings the benefit of automatic `Escape` key binding plus a modal `::backdrop` overlay. Other niceties include:
+- Referencing external code without having to rely on build tools like [glslify](https://github.com/glslify/glslify).
+- Customizable CSS in places of interest via `part` attributes.
+- Shader compilation boilerplate that can be used independently in library only mode.
+- Saving and importing own sketches.
 
 ## setup
 
@@ -30,7 +34,7 @@ npm install thewhodidthis/shaderexpress
 
 ## usage
 
-Need disable controls for iOS pointermove events to work in full screen mode.
+Need disable controls for iOS pointermove events to work in fullscreen mode.
 
 ```html
 <!-- Mark it up. -->
@@ -51,3 +55,4 @@ void sketch(in vec2 p, out vec4 oColor) {
 ## see also
 
 - [@thewhodidthis/glx](https://github.com/thewhodidthis/glx/)
+- [@thewhodidthis/rtx](https://github.com/thewhodidthis/rtx/)

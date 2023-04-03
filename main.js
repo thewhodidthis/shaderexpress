@@ -90,7 +90,6 @@ export class ShaderExpress extends Dummy {
       textarea.dispatchEvent(inputevent)
     })
 
-    const video = this.shadowRoot.querySelector("video")
     const dialog = this.shadowRoot.querySelector("dialog")
 
     dialog.addEventListener("close", () => {
@@ -103,6 +102,8 @@ export class ShaderExpress extends Dummy {
         document.exitPictureInPicture()
       }
     })
+
+    const video = this.shadowRoot.querySelector("video")
 
     this.addEventListener("edit", async function onedit() {
       if (document.pictureInPictureEnabled) {

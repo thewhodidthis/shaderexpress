@@ -68,7 +68,7 @@ export class ShaderExpress extends Dummy {
       <video height="${this.height}" width="${this.width}" part="video" muted playsinline></video>
       <dialog part="dialog">
         <form method="dialog" part="form">
-          <textarea spellcheck="false" part="textarea"></textarea>
+          <textarea spellcheck="false" part="textarea" autofocus></textarea>
           <menu part="menu">
             <li><input type="submit" value="Update"></li>
             <li><button value="Cancel">Back</button></li>

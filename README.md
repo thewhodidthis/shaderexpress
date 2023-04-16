@@ -34,7 +34,7 @@ npm install thewhodidthis/shaderexpress
 
 ## usage
 
-Need disable controls for iOS pointermove events to work in fullscreen mode. Also, picture-in-picture is known to [not work programmatically on Firefox](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement/requestPictureInPicture#browser_compatibility) at the moment.
+Need disable controls for iOS pointermove events to work in fullscreen mode. Also, picture-in-picture is known to be [unavailable programmatically on Firefox](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement/requestPictureInPicture#browser_compatibility) at the moment.
 
 ```html
 <!-- Mark it up. -->
